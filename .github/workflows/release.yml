@@ -1,0 +1,114 @@
+name: Release Swift SDK
+
+on:
+  repository_dispatch:
+    types: [erika-release]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Erika version to release
+        required: true
+        type: string
+      checksum:
+        description: SwiftPM checksum for the Erika binary archive
+        required: true
+        type: string
+      source_tag:
+        description: Erika source release tag
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: erika-swift-release-${{ github.event.client_payload.version || inputs.version }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Update and release Swift package
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      VERSION: ${{ github.event.client_payload.version || inputs.version }}
+      CHECKSUM: ${{ github.event.client_payload.checksum || inputs.checksum }}
+      SOURCE_TAG: ${{ github.event.client_payload.source_tag || inputs.source_tag }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Validate release inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          [[ "$CHECKSUM" =~ ^[0-9a-f]{64}$ ]]
+          [[ "$SOURCE_TAG" == "v$VERSION" ]]
+          curl --fail --location \
+            "https://api.github.com/repos/AimesSoft/Erika/releases/tags/${SOURCE_TAG}" \
+            | jq -r '.assets[].name' \
+            | grep -Fxq "erika-swift-core-${VERSION}.xcframework.zip"
+
+      - name: Update the SwiftPM binary target
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive_url="https://github.com/AimesSoft/Erika/releases/download/v${VERSION}/erika-swift-core-${VERSION}.xcframework.zip"
+          sed -i '' -E \
+            "s#url: \"https://github.com/AimesSoft/Erika/releases/download/v[0-9.]+/erika-swift-core-[0-9.]+\\.xcframework\\.zip\"#url: \"${archive_url}\"#" \
+            Package.swift
+          sed -i '' -E \
+            "s/(checksum: \")[0-9a-f]+(\")/\\1${CHECKSUM}\\2/" \
+            Package.swift
+          # Keep user-facing release links and examples aligned with the SDK tag.
+          for file in README.md README.zh.md THIRD_PARTY_NOTICES.md Examples/Player/README.md; do
+            if grep -q '0\.1\.7' "$file"; then
+              sed -i '' "s/0\\.1\\.7/${VERSION}/g" "$file"
+            fi
+          done
+          grep -Fq "${CHECKSUM}" Package.swift
+          grep -Fq "erika-swift-core-${VERSION}.xcframework.zip" Package.swift
+
+      - name: Validate and test the package
+        run: |
+          swift package dump-package
+          swift test
+
+      - name: Commit and tag the release
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Package.swift README.md README.zh.md THIRD_PARTY_NOTICES.md Examples/Player/README.md
+          if git diff --cached --quiet; then
+            echo "No package changes are required."
+          else
+            git commit -m "Release Erika Swift SDK v${VERSION}"
+            git push origin HEAD:main
+          fi
+
+          tag="v${VERSION}"
+          if git ls-remote --exit-code --tags origin "refs/tags/${tag}" >/dev/null 2>&1; then
+            echo "${tag} already exists; release creation is complete."
+            exit 0
+          fi
+          git tag -a "$tag" -m "$tag"
+          git push origin "$tag"
+
+          notes="$RUNNER_TEMP/release-notes.md"
+          printf '%s\n\n' "Erika Swift SDK v${VERSION}" > "$notes"
+          printf '%s\n' \
+            "- 更新 Erika 核心二进制到 v${VERSION}" \
+            "- 支持 macOS、iOS 和 tvOS 的 SwiftPM 集成" \
+            "- 提供 UIKit、AppKit 和 SwiftUI 播放视图" \
+            "- SwiftPM checksum: \`${CHECKSUM}\`" >> "$notes"
+          gh release create "$tag" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "$tag" \
+            --notes-file "$notes"
