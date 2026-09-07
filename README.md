@@ -20,7 +20,7 @@ In Xcode, choose **File > Add Package Dependencies** and enter:
 https://github.com/AimesSoft/ErikaSwift
 ```
 
-Select version `0.1.7` or later and add the `Erika` product to your target.
+Select version `0.1.8` or later and add the `Erika` product to your target.
 
 ## UIKit / AppKit
 
@@ -64,14 +64,14 @@ position, buffering, track, decoder, and output changes.
 
 ## Available APIs
 
-- open local files and HTTP(S) streams with custom headers
+- open local files and HTTP(S) streams with custom headers and read-ahead control
 - play, pause, stop, seek, playback rate, and volume
-- audio and subtitle track discovery and selection
-- external subtitles and subtitle scaling
-- Bilibili XML / JSON danmaku tracks
+- audio and subtitle track discovery, selection, and bitrate/frame-rate metadata
+- external subtitles, subtitle scaling/style, and in-memory font registration
+- Bilibili XML / JSON danmaku tracks, offsets, filtering, and layout configuration
 - SDR, Apple EDR, extended-linear, and automatic output modes
-- ArtCNN luma upscaling modes
-- playback, output, and resource statistics
+- packed-alpha video output and ArtCNN luma upscaling modes
+- playback, decoder, output, upscaler, and resource statistics
 - composited RGBA frame capture
 - UIKit, AppKit, and SwiftUI video views
 
