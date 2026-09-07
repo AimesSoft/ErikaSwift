@@ -18,7 +18,7 @@ Erika 的 macOS、iOS 和 tvOS 原生 Swift SDK。Swift Package Manager 会自�
 https://github.com/AimesSoft/ErikaSwift
 ```
 
-选择 `0.1.7` 或更高版本，并把 `Erika` product 加入应用 target。
+选择 `0.1.8` 或更高版本，并把 `Erika` product 加入应用 target。
 
 ## 使用
 
@@ -37,10 +37,11 @@ try player.play()
 SwiftUI 使用 `ErikaPlayerView(player:)`。`ErikaVideoView` 会管理
 `CAMetalLayer`、drawable size 和逐帧渲染。
 
-SDK 已覆盖播放控制、HTTP headers、音视频与字幕轨道、外挂字幕、弹幕、
-HDR/EDR 输出、ArtCNN 放大、资源统计和 RGBA 截图。`ErikaPlayer` 需要在主线程创建和调用。
+SDK 已覆盖播放控制、HTTP headers/read-ahead、音视频与字幕轨道元数据、外挂字幕、
+字幕样式与内存字体、弹幕多轨道与布局配置、HDR/EDR/packed-alpha 输出、
+ArtCNN 放大、解码器/输出/资源统计和 RGBA 截图。`ErikaPlayer` 需要在主线程创建和调用。
 
 ## 许可证
 
 Swift 封装使用 MPL-2.0。预编译二进制包含 Erika 及静态链接的原生依赖，详情见
-`THIRD_PARTY_NOTICES.md` 和 Erika `v0.1.7` Release 内的许可证文件。
+`THIRD_PARTY_NOTICES.md` 和 Erika `v0.1.8` Release 内的许可证文件。
