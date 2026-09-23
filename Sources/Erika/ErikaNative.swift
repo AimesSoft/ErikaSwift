@@ -40,7 +40,9 @@ func openNative(_ handle: OpaquePointer, source: String, options: ErikaOpenOptio
         try headers.withUnsafeBufferPointer { buffer in
             var native = CErika.ErikaOpenOptions(
                 headers: buffer.baseAddress, header_count: UInt(buffer.count),
-                http_read_ahead_bytes: options.httpReadAheadBytes, reserved: (0, 0, 0)
+                http_read_ahead_bytes: options.httpReadAheadBytes,
+                http_back_buffer_bytes: options.httpBackBufferBytes,
+                reserved: (0, 0)
             )
             try erikaCheck(erika_presenter_open_with_options(handle, uri, &native))
         }

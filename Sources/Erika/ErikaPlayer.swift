@@ -49,13 +49,37 @@ public final class ErikaPlayer {
         }
     }
 
-    public func open(_ url: URL, httpHeaders: [String: String] = [:], httpReadAheadBytes: UInt64 = 0) throws {
+    public func open(
+        _ url: URL,
+        httpHeaders: [String: String] = [:],
+        httpReadAheadBytes: UInt64 = 0,
+        httpBackBufferBytes: UInt64 = 0
+    ) throws {
         let source = url.isFileURL ? url.path : url.absoluteString
-        try open(source, options: ErikaOpenOptions(httpHeaders: httpHeaders, httpReadAheadBytes: httpReadAheadBytes))
+        try open(
+            source,
+            options: ErikaOpenOptions(
+                httpHeaders: httpHeaders,
+                httpReadAheadBytes: httpReadAheadBytes,
+                httpBackBufferBytes: httpBackBufferBytes
+            )
+        )
     }
 
-    public func open(_ source: String, httpHeaders: [String: String] = [:], httpReadAheadBytes: UInt64 = 0) throws {
-        try open(source, options: ErikaOpenOptions(httpHeaders: httpHeaders, httpReadAheadBytes: httpReadAheadBytes))
+    public func open(
+        _ source: String,
+        httpHeaders: [String: String] = [:],
+        httpReadAheadBytes: UInt64 = 0,
+        httpBackBufferBytes: UInt64 = 0
+    ) throws {
+        try open(
+            source,
+            options: ErikaOpenOptions(
+                httpHeaders: httpHeaders,
+                httpReadAheadBytes: httpReadAheadBytes,
+                httpBackBufferBytes: httpBackBufferBytes
+            )
+        )
     }
 
     public func open(_ source: String, options: ErikaOpenOptions) throws {

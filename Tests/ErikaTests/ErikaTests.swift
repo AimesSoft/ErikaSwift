@@ -25,9 +25,14 @@ final class ErikaTests: XCTestCase {
     }
 
     func testOpenOptionsDefaultsAndHeaders() {
-        let options = ErikaOpenOptions(httpHeaders: ["X-Test": "ok"], httpReadAheadBytes: 2 * 1024 * 1024)
+        let options = ErikaOpenOptions(
+            httpHeaders: ["X-Test": "ok"],
+            httpReadAheadBytes: 2 * 1024 * 1024,
+            httpBackBufferBytes: 16 * 1024 * 1024
+        )
         XCTAssertEqual(options.httpHeaders["X-Test"], "ok")
         XCTAssertEqual(options.httpReadAheadBytes, 2 * 1024 * 1024)
+        XCTAssertEqual(options.httpBackBufferBytes, 16 * 1024 * 1024)
     }
 
     func testLegacyPlaybackEventJSONRemainsDecodable() throws {

@@ -408,10 +408,16 @@ public enum ErikaVideoAlphaMode: Int32, Codable, Sendable, CaseIterable {
 public struct ErikaOpenOptions: Sendable, Equatable {
     public var httpHeaders: [String: String]
     public var httpReadAheadBytes: UInt64
+    public var httpBackBufferBytes: UInt64
 
-    public init(httpHeaders: [String: String] = [:], httpReadAheadBytes: UInt64 = 0) {
+    public init(
+        httpHeaders: [String: String] = [:],
+        httpReadAheadBytes: UInt64 = 0,
+        httpBackBufferBytes: UInt64 = 0
+    ) {
         self.httpHeaders = httpHeaders
         self.httpReadAheadBytes = httpReadAheadBytes
+        self.httpBackBufferBytes = httpBackBufferBytes
     }
 }
 
